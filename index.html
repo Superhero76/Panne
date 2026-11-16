@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Terminal de secours · LH 2050</title>
+<style>
+@font-face { font-family: "Terminal"; src: url("polices/share-tech-mono-latin-400-normal.woff") format("woff"); font-display: swap; }
+:root { --fond:#04121a; --panneau:#06202b; --cyan:#5af5ff; --pale:#c9f6fb; --ambre:#ffc24a; --rouge:#ff6b5e; --ligne:#1b5361; }
+* { box-sizing: border-box; }
+html { background: var(--fond); }
+body { margin: 0 auto; max-width: 600px; padding: 12px 12px 48px; color: var(--pale); background: var(--fond);
+  font-family: "Terminal", ui-monospace, Menlo, Consolas, monospace; font-size: 17px; line-height: 1.45; }
+header { border: 2px solid var(--cyan); padding: 10px 12px; margin-bottom: 14px; }
+h1 { margin: 0; font-size: 20px; font-weight: 400; color: var(--cyan); letter-spacing: .04em; }
+.etat { margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 15px; }
+.panne { color: var(--ambre); }
+.clign { animation: clign 1.6s steps(2, start) infinite; }
+@keyframes clign { to { visibility: hidden; } }
+p { margin: 0 0 10px; }
+a { color: var(--cyan); }
+section { border: 2px solid var(--ligne); background: var(--panneau); padding: 10px; margin: 0 0 14px; }
+section.ouverte { border-color: var(--cyan); }
+h2 { margin: 0 0 8px; font-size: 18px; font-weight: 400; color: var(--cyan); letter-spacing: .04em; }
+.verrou { color: var(--ambre); margin: 0; }
+.cadre { border: 1px solid var(--ligne); background: #000; overflow: auto; max-height: 78vh; -webkit-overflow-scrolling: touch; }
+.cadre img { display: block; width: 100%; height: auto; }
+.zoom { display: flex; gap: 8px; margin: 8px 0 10px; }
+button, input { font: inherit; }
+button { min-height: 46px; padding: 8px 14px; color: var(--cyan); background: var(--fond); border: 2px solid var(--cyan); border-radius: 0; cursor: pointer; }
+button[aria-pressed="true"] { color: var(--fond); background: var(--cyan); }
+button:disabled { opacity: .55; cursor: wait; }
+.zoom button { flex: 1; }
+.fiche { margin: 0 0 10px; padding: 0; list-style: none; }
+.fiche li { padding-left: 1.2em; text-indent: -1.2em; margin-bottom: 6px; }
+.fiche li::before { content: "> "; color: var(--cyan); }
+.format { color: var(--ambre); }
+form { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px; }
+label { flex: 1 0 100%; color: var(--cyan); }
+input[type=text] { flex: 1 1 200px; min-width: 0; min-height: 46px; padding: 8px 10px; color: #fff; background: #000; border: 2px solid var(--cyan); border-radius: 0;
+  text-transform: uppercase; letter-spacing: .08em; }
+input:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid var(--ambre); outline-offset: 2px; }
+.msg { min-height: 1.5em; margin: 0; }
+.msg.ko { color: var(--rouge); }
+.msg.ok { color: var(--cyan); }
+.revele { animation: revele .9s steps(9) both; }
+@keyframes revele { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+footer { font-size: 15px; color: #8fc3cb; }
+footer button { min-height: 40px; font-size: 15px; color: var(--ambre); border-color: var(--ambre); }
+#ancien { display: none; border: 2px solid var(--rouge); color: #fff; padding: 12px; margin-bottom: 14px; }
+@media (prefers-reduced-motion: reduce) { .clign, .revele { animation: none; } }
+</style>
+</head>
+<body>
+<div id="ancien" role="alert"></div>
+<header>
+  <h1>TERMINAL DE SECOURS · LH&nbsp;2050</h1>
+  <p class="etat"><span class="panne">RÉSEAU AR : HORS LIGNE<span class="clign" aria-hidden="true"> _</span></span><span id="compteur">VUES EN MÉMOIRE : 1/3</span></p>
+</header>
+
+<p>Les balises ne s'affichent plus. Ce terminal garde seulement les dernières vues : chacune a été prise de l'endroit où il fallait se tenir, la flèche montre ce qu'il fallait regarder.</p>
+<p>Retrouvez l'endroit dans la vraie ville, placez-vous au point de vue et relevez ce qui est demandé. <a href="gabarit_lunettes.pdf">Lunettes de secours (gabarit à imprimer)</a></p>
+
+<section id="b1" class="ouverte" aria-labelledby="t1">
+  <h2 id="t1">BALISE 01 · ANCRE PERDUE</h2>
+  <div class="cadre" id="cadre1" tabindex="0"><img id="img1" src="vue1_terminal.png" width="896" height="1195" alt="Vue de 2050 : un grand bâtiment à tour d'horloge ; une flèche désigne un petit bloc au premier plan, à gauche."></div>
+  <div class="zoom" data-cadre="cadre1" role="group" aria-label="Agrandissement de la vue 1">
+    <button type="button" data-z="1" aria-pressed="true">×1</button><button type="button" data-z="2" aria-pressed="false">×2</button><button type="button" data-z="3" aria-pressed="false">×3</button>
+  </div>
+  <ul class="fiche">
+    <li>Point de vue : à moins de 200&nbsp;m des coordonnées de la cache.</li>
+    <li>À relever : un mot de 7 lettres sur la balise, puis les 3 derniers chiffres de la plus longue série de chiffres du panneau de l'aire de jeux.</li>
+    <li class="format">Format : 7 lettres et 3 chiffres, sans espace.</li>
+  </ul>
+  <form id="f1" autocomplete="off">
+    <label for="c1">Code de reprise n°&nbsp;1 : 12 caractères, donnés par Certitude. Ce n'est pas votre réponse.</label>
+    <input type="text" id="c1" inputmode="text" autocapitalize="characters" autocorrect="off" spellcheck="false" maxlength="24">
+    <button type="submit" id="s1">Resynchroniser</button>
+  </form>
+  <p class="msg" id="m1" role="status"></p>
+</section>
+
+<section id="b2" aria-labelledby="t2">
+  <h2 id="t2">BALISE 02</h2>
+  <p class="verrou" id="v2">Vue verrouillée : en attente du code de reprise n°&nbsp;1.</p>
+  <div id="corps2" hidden>
+    <div class="cadre" id="cadre2" tabindex="0"><img id="img2" alt=""></div>
+    <div class="zoom" data-cadre="cadre2" role="group" aria-label="Agrandissement de la vue 2">
+      <button type="button" data-z="1" aria-pressed="true">×1</button><button type="button" data-z="2" aria-pressed="false">×2</button><button type="button" data-z="3" aria-pressed="false">×3</button>
+    </div>
+    <ul class="fiche" id="fiche2"></ul>
+    <form id="f2" autocomplete="off">
+      <label for="c2">Code de reprise n°&nbsp;2 : 12 caractères, donnés par Certitude. Ce n'est pas votre réponse.</label>
+      <input type="text" id="c2" inputmode="text" autocapitalize="characters" autocorrect="off" spellcheck="false" maxlength="24">
+      <button type="submit" id="s2">Resynchroniser</button>
+    </form>
+    <p class="msg" id="m2" role="status"></p>
+  </div>
+</section>
+
+<section id="b3" aria-labelledby="t3">
+  <h2 id="t3">BALISE 03</h2>
+  <p class="verrou" id="v3">Vue verrouillée : en attente du code de reprise n°&nbsp;2.</p>
+  <div id="corps3" hidden>
+    <div class="cadre" id="cadre3" tabindex="0"><img id="img3" alt=""></div>
+    <div class="zoom" data-cadre="cadre3" role="group" aria-label="Agrandissement de la vue 3">
+      <button type="button" data-z="1" aria-pressed="true">×1</button><button type="button" data-z="2" aria-pressed="false">×2</button><button type="button" data-z="3" aria-pressed="false">×3</button>
+    </div>
+    <ul class="fiche" id="fiche3"></ul>
+  </div>
+</section>
+
+<footer>
+  <p>Votre progression est gardée sur cet appareil, dans ce navigateur. Aucune caméra, aucune position : le terminal n'affiche que des images.</p>
+  <p><button type="button" id="raz">Effacer la progression</button></p>
+</footer>
+
+<script>
+(function () {
+  var manque = [];
+  if (!window.crypto || !window.crypto.subtle) manque.push(window.isSecureContext === false ? "la page doit être ouverte à son adresse en ligne (https), pas depuis un fichier" : "chiffrement indisponible");
+  if (!window.fetch || !window.Promise || !window.TextEncoder) manque.push("navigateur trop ancien");
+  if (manque.length) {
+    var d = document.getElementById("ancien");
+    d.style.display = "block";
+    d.textContent = "Ce terminal ne peut pas démarrer ici : " + manque.join(" ; ") + ". Essayez avec un navigateur récent (Safari, Chrome, Firefox).";
+  }
+})();
+</script>
+<script type="module">
+const COFFRES = [{"v":1,"it":1500000,"sel":"nWyG1Dr59I91HppMk+UCTw==","iv":"cf3EyDDJgSNu1hs+","ct":"ObtTHvxpCtOuVn3+KNFCSlWJ8Q05rxz9anMh/ErOSeq27LAZFaNIiFC2UOdYVLR1xKOi/GFTDr0na5zJUCrFhoJr1A06pDVclov5PBtbJWnP3p5A3Px69gatFKhKALtjE4cVpUgdAf0aWQPy1ZGYb0uqTXQgtD5xB8OvRoOxkuGbCcolbq+7cloqxOMZQe+duyPaAtegNRBOUcgnRG53ugUHE0Tw3YrVBuLVJ9+yFHVUgrlUpAEpwDhDH3wm+FRdPJ2/9XfzxZB3DYzxcEcN5/yA4ezcO0fQpnk1Rd1bzRcDqvAAWgZD879//IS5wCE49uffWDccbdqqynXoBuBtPogbO9qlvusqfs6f27MJaUnu3zwu7alNQe4nk/5flcGWPLundyEL7ZVYj7HZ4FsYrKOosI3UzQ0VL0z4zXbiNxMVtqg+UCwlxs6NpOrqZRpHwVLIG8zZIo3/jdbY6J+/mA0H9OgJdsRS0aCYAlEj/I/cfT5aaia11C29F/ZwBKPd+A+6Gu87zJ+iMyXMembz96DgmcuY/OQzVta+1xC3Aj+5qYTWVWc9I+mKambGUlys5wOrEKN0WJN0FDZeR/P03JG35iQug+bUXXxNowoIqtnlMq4tTt27RAfLZ2N86MxAcbQJT2eFz03S/LDWfytogSuoepBWQ6npKuigMWHNHZ8NUsdL7WTsUG2GrOj3FUoLMzq2rRPPV7Sf8NI0B2TF7assjIpLt5CeL32LHAo30Z9BZd8Xx55xvIjl5V7SwCKw2YCIjPMuitoFpQrhJcRlNHS7fISMa4taKi5dq7van4Jvw8+C+Uu9nKjcZEvgMf6FMGLGBoWBceESBaOc+tExxJDITePY5Vl8C6O2EGtJYr3R9rcaSxFQUqkOhFkko+k/+hy4F0AHdGkBJd/x5RwkFB4Jkk+kFweY5Ruu","json":true},{"v":1,"it":1500000,"sel":"JJebXU/+KNDVGJRbtDLZ9g==","iv":"mZsWdYB3G5Yhu9j5","ct":"ClhsFVKonUzYxCkp1+e/LUhhlnXjJUWFQSGot4KnJ/2BxhNg8kJ/PWsqbGe5vIMaqbYNqcAKedCePzgGHFRzI2pKYUfScNEKiHHkPfRqQb7b53XQ+r8RL1iPM88lc6okU5f3MMWrma3c42Pn4bvQCtsbOabSwsVfsXtlY9AGwSPym93b+aIDn144QJ5bara8MTXhNlh43YdydUnJJ8yB2oEMf0GSLvsNDe0GQgBFWJypkrBg6TBhMiHFbl2pzCIzsRmAuWOzdVTLvaps43TAphSnwBpNbakTIMyBfvxY2y7Cj8brpMhHZz7t/YMVrII7tewxPNxNGtdh2ki+x9Ow2Xb4Jxdp54tC6Yp1UAeSDl4beokRciHz8Zvye6VfNVE3FXY1EphhYbzGbEkhFdmHpfApPuHaSQFJcBV5ZTvpTRh3WGBKzlejI4aiyNmZByGsGpsV8VgGm+KtM8WpSioFkg9Wos6IaPpjBv+/mh+P+YoTX1Da3U97lyZAHrvXy+YQS2rgJC9Uye9aykeg/B3dgwEQ/a7e0f7d2o5GiBdm9PubRt7i8hodZElRCsodzZ77bGF2HwUh0x/k2TSxLtuuCD+s9LpL85sYUh3DDn4uzryu3q58VCRhIL+/PBDpSLHcDkH18jNrWQJ6JNdw6ka/kSX47x0/3P1ogDHfCf+R3WEFtaYB54FaljYq779VpcIjkBjnwYMZhgvK9wB/LUpzFtgbA+4/ZTh5Ds1pqOXrz/HQtupht/HbTGMX5LzieLmUjkNffVrqimZhxVtPOnpsUqGpRbOwD3sNVfMIyeEgglydZx5mgiLmkjS2ndCjqQQq/PbsI7/bN6ifcWJv1MWaFF5o3/seqqqHrH6qSRHcBNR+aHRDdikqKMlCMul0h7gTsZQ9Ki2u3nYvMmgH2dVl5MOFlgO8nJIRPNohLDhfLzKcXXudypTNZ59vCAVoYt5o412AvDlyGgV+SQejjMONk/Kk4kgOG5wuceJnp5kvt4FUMJpXTC8LlEqM0BSlbtE9lRcdluID3KRfMBExUKHXZQvctsQAbL59bzGYbKBhRatCOhBI221yrFRJrwmoswUJ6ASwgp7JthRXo9UvUJnFfYw/2Qq/vRZ2bWign/BvsdRTTY5MPJAm7p+OH6ir7g0D1mJU7ke68UvknWkEwkjXfAbzIQUQH50fApQvLoLc4uHTzliSfLpUldUR87ygP/Zs6PCveEH0vguQ/AwRZQeF6p7cQNPGKkV0AxONFg9J8x7KSkShDKgsug==","json":true}];
+const CLE = "panne.v1";
+const etat = { k: [null, null], ouvertes: 1 };
+
+function normaliserCode(s, garder = "-") {
+  return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase()
+          .split("").filter(c => /[A-Z0-9]/.test(c) || garder.includes(c)).join("");
+}
+const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+async function ouvrirCoffre(coffre, code, cleAcces = null) {
+  const secret = (cleAcces ? cleAcces + ":" : "") + normaliserCode(code);
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), "PBKDF2", false, ["deriveKey"]);
+  const cle = await crypto.subtle.deriveKey(
+      { name: "PBKDF2", salt: b64(coffre.sel), iterations: coffre.it, hash: "SHA-256" },
+      base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+  try {
+    const clair = new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64(coffre.iv) }, cle, b64(coffre.ct)));
+    return coffre.json ? JSON.parse(clair) : clair;
+  } catch (e) { return null; }
+}
+
+async function ouvrirImage(d) {
+  const r = await fetch(d.f);
+  if (!r.ok) throw new Error("vue introuvable");
+  const o = b64((await r.text()).trim());
+  const cle = await crypto.subtle.importKey("raw", b64(d.k), "AES-GCM", false, ["decrypt"]);
+  const clair = await crypto.subtle.decrypt({ name: "AES-GCM", iv: o.slice(0, 12) }, cle, o.slice(12));
+  return URL.createObjectURL(new Blob([clair], { type: d.t }));
+}
+
+function lire() {
+  try { const o = JSON.parse(localStorage.getItem(CLE)); if (o && Array.isArray(o.k)) etat.k = [o.k[0] || null, o.k[1] || null]; } catch (e) {}
+}
+function ecrire() { try { localStorage.setItem(CLE, JSON.stringify({ k: etat.k })); } catch (e) {} }
+function oublier() { try { localStorage.removeItem(CLE); } catch (e) {} }
+
+const el = id => document.getElementById(id);
+function compteur() { el("compteur").textContent = "VUES EN MÉMOIRE : " + etat.ouvertes + "/3"; }
+function ligne(ul, texte, classe, lien) {
+  const li = document.createElement("li");
+  if (classe) li.className = classe;
+  if (lien) { const a = document.createElement("a"); a.href = lien; a.rel = "noopener"; a.textContent = texte; li.append(a); }
+  else li.textContent = texte;
+  ul.append(li);
+}
+
+async function monter(n, c, anime) {
+  el("t" + n).textContent = c.titre;
+  const ul = el("fiche" + n); ul.textContent = "";
+  for (const l of c.lignes) ligne(ul, l);
+  if (c.format) ligne(ul, "Format : " + c.format, "format");
+  if (c.gabarit) ligne(ul, "Lunettes de secours (gabarit)", "", c.gabarit);
+  const img = el("img" + n);
+  img.alt = c.alt || "";
+  try { img.src = await ouvrirImage(c.img); } catch (e) { ligne(ul, "Vue indisponible : rechargez la page avec du réseau.", "format"); }
+  el("v" + n).hidden = true; el("corps" + n).hidden = false;
+  el("b" + n).classList.add("ouverte");
+  if (anime) el("corps" + n).classList.add("revele");
+  etat.ouvertes = Math.max(etat.ouvertes, n); compteur();
+}
+function figer(n, code) {
+  const c = el("c" + n); c.value = code; c.readOnly = true;
+  el("s" + n).disabled = true; el("s" + n).textContent = "Rétabli";
+}
+function message(n, texte, classe) { const m = el("m" + n); m.textContent = texte; m.className = "msg" + (classe ? " " + classe : ""); }
+
+async function essayer(n, saisie, anime) {
+  const code = normaliserCode(saisie, "");
+  if (!code) return false;
+  const c = await ouvrirCoffre(COFFRES[n - 1], code, n === 2 ? etat.k[0] : null);
+  if (!c) return false;
+  etat.k[n - 1] = code;
+  figer(n, code);
+  await monter(n + 1, c, anime);
+  return true;
+}
+for (const n of [1, 2]) {
+  el("f" + n).addEventListener("submit", async ev => {
+    ev.preventDefault();
+    if (el("s" + n).disabled) return;
+    const saisi = normaliserCode(el("c" + n).value, "");
+    if (!saisi) { message(n, "Saisissez le code de reprise.", "ko"); return; }
+    if (saisi.length !== 12) { message(n, "Ce n'est pas un code de reprise. Vérifiez d'abord votre réponse avec Certitude : il vous donne un code de 12 caractères.", "ko"); return; }
+    el("s" + n).disabled = true; message(n, "Synchronisation…", "");
+    let ok = false;
+    try { ok = await essayer(n, el("c" + n).value, true); } catch (e) { ok = false; }
+    if (ok) { ecrire(); message(n, "Vue suivante rétablie.", "ok"); el("b" + (n + 1)).scrollIntoView({ behavior: "smooth", block: "start" }); }
+    else { el("s" + n).disabled = false; message(n, "Code refusé.", "ko"); }
+  });
+}
+
+for (const g of document.querySelectorAll(".zoom")) {
+  const cadre = el(g.dataset.cadre), img = cadre.querySelector("img");
+  g.addEventListener("click", ev => {
+    const b = ev.target.closest("button"); if (!b) return;
+    const z = +b.dataset.z, fx = (cadre.scrollLeft + cadre.clientWidth / 2) / cadre.scrollWidth, fy = (cadre.scrollTop + cadre.clientHeight / 2) / cadre.scrollHeight;
+    img.style.width = (100 * z) + "%";
+    cadre.scrollLeft = fx * cadre.scrollWidth - cadre.clientWidth / 2; cadre.scrollTop = fy * cadre.scrollHeight - cadre.clientHeight / 2;
+    for (const x of g.querySelectorAll("button")) x.setAttribute("aria-pressed", x === b ? "true" : "false");
+  });
+}
+
+let arme = 0;
+el("raz").addEventListener("click", () => {
+  if (Date.now() - arme < 4000) { oublier(); location.reload(); return; }
+  arme = Date.now(); el("raz").textContent = "Toucher encore pour confirmer";
+  setTimeout(() => { arme = 0; el("raz").textContent = "Effacer la progression"; }, 4000);
+});
+
+async function reprise() {
+  lire();
+  const [k1, k2] = etat.k; etat.k = [null, null];
+  try {
+    if (k1 && await essayer(1, k1, false)) { if (!(k2 && await essayer(2, k2, false))) etat.k[1] = null; }
+  } catch (e) {}
+  if (k1 || k2) { if (etat.k[0]) ecrire(); else oublier(); }
+  document.documentElement.dataset.pret = "1";
+}
+
+if (window.crypto && crypto.subtle) reprise(); else document.documentElement.dataset.pret = "1";
+</script>
+</body>
+</html>
